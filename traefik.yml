@@ -1,0 +1,28 @@
+# Enable the API and dashboard
+api:
+  insecure: true
+  dashboard: true
+
+# Enable the access log
+accessLog: {}
+
+# Define the entrypoint for web traffic
+entryPoints:
+  web:
+    address: ":8000"
+    transport:
+      keepAliveMaxTime: 100s
+      keepAliveMaxRequests: 100
+
+# Define providers
+providers:
+  docker:
+    # It's good practice to not expose all containers by default
+    exposedByDefault: false
+
+serversTransport:
+  maxIdleConnsPerHost: 50
+  forwardingTimeouts:
+    # dialTimeout: 1s
+    responseHeaderTimeout: 10s
+    idleConnTimeout: 2s

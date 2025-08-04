@@ -1,0 +1,30 @@
+services:
+  traefik:
+    image: "traefik:latest"
+    command:
+      - "--configFile=/etc/traefik/traefik.yml"
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+    volumes:
+      - "./traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - web
+  simple:
+    build: .
+    ports:
+      - "3000:3000"
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.simple.rule=Host(`simple.localhost`)"
+      - "traefik.http.services.simple.loadbalancer.server.port=5120"
+      - "traefik.http.services.simple.loadbalancer.responseForwarding.flushInterval=-1"
+      - "traefik.http.middlewares.simple-retry.retry.attempts=3"
+      - "traefik.http.middlewares.simple-retry.retry.initialInterval=200ms"
+      - "traefik.http.routers.simple.middlewares=simple-retry"
+networks:
+  web:
+    external: true
